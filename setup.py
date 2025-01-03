@@ -9,6 +9,8 @@ setup(
         'argparse', 
     ],
     description="A tool for embedding and extracting files and strings with AES encryption.",
+    author = 'Oleg Beznogy',
+    author_email = 'olegbeznogy@gmail.com',
     url="https://github.com/moshiax/mymra",
     classifiers=[
         'Programming Language :: Python :: 3',
