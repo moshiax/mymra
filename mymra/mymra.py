@@ -12,13 +12,13 @@ def generate_password_key(password):
 
 def encrypt_data(data, key):
     iv = get_random_bytes(AES.block_size)
-    cipher = AES.new(key, AES.MODE_CBC, iv)
+    cipher = AES.new(key, AES.MODE_GCM, iv)
     encrypted_data = cipher.encrypt(pad(data, AES.block_size))
     return iv + encrypted_data
 
 def decrypt_data(encrypted_data, key):
     iv = encrypted_data[:AES.block_size]
-    cipher = AES.new(key, AES.MODE_CBC, iv)
+    cipher = AES.new(key, AES.MODE_GCM, iv)
     try:
         decrypted_data = unpad(cipher.decrypt(encrypted_data[AES.block_size:]), AES.block_size)
     except (ValueError, KeyError) as e:
@@ -187,7 +187,11 @@ def main():
     deembed_parser.set_defaults(func=process_deembed_file)
 
     args = parser.parse_args()
-    args.func(args)
 
-if __name__ == '__main__':
+    if not vars(args):
+        parser.print_help()
+    else:
+        args.func(args)
+
+if __name__ == "__main__":
     main()
