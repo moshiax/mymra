@@ -17,7 +17,7 @@ pip install pycryptodome
 To embed a file within another file using AES encryption, run the command:
 
 ```bash
-python mymra.py embed <input_file> <host_file> <output_file> -p <password>
+mymra embed <input_file> <host_file> <output_file> -p <password>
 ```
 
 **Options**:
@@ -31,7 +31,7 @@ python mymra.py embed <input_file> <host_file> <output_file> -p <password>
 To retrieve a file from storage using AES encryption, run the command:
 
 ```bash
-python mymra.py extract <host_file> -p <password>
+mymra extract <host_file> -p <password>
 ```
 
 **Options**:
@@ -65,13 +65,13 @@ extract_file('1488.png', 'COCKER')
 1. Embed the file `123.mp4` into the file `123.png` with the password `COCKER` and save it in `1488.png`:
 
 ```bash
-python mymra.py embed 123.mp4 123.png 1488.png -p COCKER
+mymra embed 123.mp4 123.png 1488.png -p COCKER
 ```
 
 2. Extract the file from `1488.png` with the password `COCKER`:
 
 ```bash
-python mymra.py extract 1488.png -p COCKER
+mymra extract 1488.png -p COCKER
 ```
 
 
@@ -80,7 +80,7 @@ python mymra.py extract 1488.png -p COCKER
 To embed a string within another file using AES encryption, run the command:
 
 ```bash
-python mymra.py embed_string <input_string> <host_file> <output_file> -p <password>
+mymra embed_string <input_string> <host_file> <output_file> -p <password>
 ```
 
 **Options**:
@@ -94,7 +94,7 @@ python mymra.py embed_string <input_string> <host_file> <output_file> -p <passwo
 To retrieve an embedded string from storage using AES decryption, run the command:
 
 ```bash
-python mymra.py extract_string <host_file> -p <password>
+mymra extract_string <host_file> -p <password>
 ```
 
 **Options**:
@@ -106,7 +106,7 @@ python mymra.py extract_string <host_file> -p <password>
 To remove all embedded data from a file and restore it to its original state, run the command:
 
 ```bash
-python mymra.py deembed <host_file> <output_file>
+mymra deembed <host_file> <output_file>
 ```
 
 **Options**:
