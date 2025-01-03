@@ -28,11 +28,14 @@ def decrypt_data(encrypted_data, key):
 def embed_file(input_file_path, host_file_path, output_file_path, password):
     key = generate_password_key(password)
 
-    with open(input_file_path, 'rb') as input_file:
-        input_data = input_file.read()
-
     with open(host_file_path, 'rb') as host_file:
         host_data = host_file.read()
+
+    if MARKER in host_data:
+        raise ValueError("The file already contains embedded data.")
+
+    with open(input_file_path, 'rb') as input_file:
+        input_data = input_file.read()
 
     file_name = os.path.basename(input_file_path)
     file_extension = os.path.splitext(file_name)[1][1:] or "DMM"
@@ -93,6 +96,9 @@ def embed_string(input_string, host_file_path, output_file_path, password):
 
     with open(host_file_path, 'rb') as host_file:
         host_data = host_file.read()
+
+    if MARKER in host_data:
+        raise ValueError("The file already contains embedded data.")
 
     encrypted_data = encrypt_data(input_string.encode(), key)
 
