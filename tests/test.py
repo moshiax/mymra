@@ -13,8 +13,8 @@ except Exception as e:
 
 # Example of extracting a file
 try:
-    extract_file('1488.png', 'COCKER')
-    print(f"{Fore.GREEN}Extracting a file - Successful{Style.RESET_ALL}")
+    file_path = extract_file('1488.png', 'COCKER')
+    print(f"{Fore.GREEN}Extracting a file - Successful: {file_path}{Style.RESET_ALL}")
 except Exception as e:
     print(f"{Fore.RED}Extracting a file - Failed! Error: {e}{Style.RESET_ALL}")
 
@@ -27,8 +27,8 @@ except Exception as e:
 
 # Example of extracting a string
 try:
-    extract_string('string_embedded.png', 'COCKER')
-    print(f"{Fore.GREEN}Extracting a string - Successful{Style.RESET_ALL}")
+    result = extract_string('string_embedded.png', 'COCKER')
+    print(f"{Fore.GREEN}Extracting a string - Successful: {result}{Style.RESET_ALL}")
 except Exception as e:
     print(f"{Fore.RED}Extracting a string - Failed! Error: {e}{Style.RESET_ALL}")
 
