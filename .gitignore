@@ -1,4 +1,4 @@
-
-/build/mymra.egg-info
-/build/mymra/__pycache__
-/build/build
+build/*
+dist/*
+mymra/*.pyc
+/mymra.egg-info

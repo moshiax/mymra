@@ -21,8 +21,8 @@ def decrypt_data(encrypted_data, key):
     cipher = AES.new(key, AES.MODE_CBC, iv)
     try:
         decrypted_data = unpad(cipher.decrypt(encrypted_data[AES.block_size:]), AES.block_size)
-    except (ValueError, KeyError):
-        return None
+    except (ValueError, KeyError) as e:
+        raise ValueError("Decryption failed. Possible invalid data or key.") from e
     return decrypted_data
 
 def embed_file(input_file_path, host_file_path, output_file_path, password):
@@ -46,7 +46,7 @@ def embed_file(input_file_path, host_file_path, output_file_path, password):
     with open(output_file_path, 'wb') as output_file:
         output_file.write(combined_data)
 
-    print(f"Inserted {file_name} in {output_file_path} with password {password}")
+    return output_file_path
 
 def extract_file(host_file_path, password):
     key = generate_password_key(password)
@@ -56,42 +56,36 @@ def extract_file(host_file_path, password):
 
     marker_index = host_data.find(MARKER)
     if marker_index == -1:
-        print(f"Failed to extract from {host_file_path} with password {password}")
-        return None
+        raise ValueError(f"Marker not found in {host_file_path}. Extraction failed.")
 
     metadata_start = marker_index + len(MARKER)
     metadata_end = host_data.find(MARKER, metadata_start)
     if metadata_end == -1:
-        print(f"Failed to extract from {host_file_path} with password {password}")
-        return None
+        raise ValueError(f"End marker not found in {host_file_path}. Extraction failed.")
 
     encrypted_metadata = host_data[metadata_start:metadata_end]
     encrypted_data = host_data[metadata_end + len(MARKER):]
 
     decrypted_metadata = decrypt_data(encrypted_metadata, key)
     if decrypted_metadata is None:
-        print(f"Failed to extract from {host_file_path} with password {password}")
-        return None
+        raise ValueError(f"Failed to decrypt metadata from {host_file_path}.")
 
     try:
         file_name, file_extension = decrypted_metadata.decode().split(':')
         if not file_extension:
             file_extension = 'DMM'
     except ValueError:
-        print(f"Failed to extract from {host_file_path} with password {password}")
-        return None
+        raise ValueError(f"Invalid metadata format in {host_file_path}.")
 
     file_name = f"{file_name}.{file_extension}" if not file_name.endswith(f".{file_extension}") else file_name
 
     decrypted_data = decrypt_data(encrypted_data, key)
     if decrypted_data is None:
-        print(f"Failed to extract from {host_file_path} with password {password}")
-        return None
+        raise ValueError(f"Failed to decrypt data from {host_file_path}.")
 
     with open(file_name, 'wb') as output_file:
         output_file.write(decrypted_data)
 
-    print(f"Extracted {file_name} from {host_file_path} with password {password}")
     return file_name
 
 def embed_string(input_string, host_file_path, output_file_path, password):
@@ -107,7 +101,7 @@ def embed_string(input_string, host_file_path, output_file_path, password):
     with open(output_file_path, 'wb') as output_file:
         output_file.write(combined_data)
 
-    print(f"Embedded string into {output_file_path} with password {password}")
+    return output_file_path
 
 def extract_string(host_file_path, password):
     key = generate_password_key(password)
@@ -117,18 +111,16 @@ def extract_string(host_file_path, password):
 
     marker_index = host_data.find(MARKER)
     if marker_index == -1:
-        print(f"Failed to extract string from {host_file_path} with password {password}")
-        return None
+        raise ValueError(f"Marker not found in {host_file_path}. Extraction failed.")
 
     encrypted_data = host_data[marker_index + len(MARKER):]
 
     decrypted_data = decrypt_data(encrypted_data, key)
     if decrypted_data is None:
-        print(f"Failed to extract string from {host_file_path} with password {password}")
-        return None
+        raise ValueError(f"Failed to decrypt data from {host_file_path} with the given password.")
 
     extracted_string = decrypted_data.decode()
-    print(f"Extracted string: {extracted_string}")
+
     return extracted_string
 
 def deembed_file(host_file_path, output_file_path):
@@ -137,15 +129,14 @@ def deembed_file(host_file_path, output_file_path):
 
     marker_index = host_data.find(MARKER)
     if marker_index == -1:
-        print(f"Failed. No embedded data found in {host_file_path}")
-        return None
+        raise ValueError(f"No embedded data found in {host_file_path}")
 
     cleaned_data = host_data[:marker_index]
 
     with open(output_file_path, 'wb') as output_file:
         output_file.write(cleaned_data)
 
-    print(f"Removed embedded data from {host_file_path} and saved to {output_file_path}")
+    return output_file_path
 
 def process_extract_file(args):
     return extract_file(args.host_file, args.password)

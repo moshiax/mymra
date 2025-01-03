@@ -42,8 +42,8 @@ python mymra.py extract <host_file> -p <password>
 
 You can use the file embedding and extracting functionality as a library by importing the appropriate functions.
 
-First, install it. 
-Go to folder build and run
+First, install it. Run
+
 ```bash
 pip install .
 ```
