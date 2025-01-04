@@ -32,9 +32,10 @@ def embed_file(input_file_path, host_file_path, output_file_path, password=None,
         password = defaultpassword 
     
     if marker is None:
-        marker = defaultmarker 
-    else:
+        marker = defaultmarker
+    elif not isinstance(marker, bytes):
         marker = marker.encode()
+
     
     key = generate_password_key(password)
     
@@ -67,8 +68,8 @@ def extract_file(host_file_path, password=None, marker=None):
         password = defaultpassword 
     
     if marker is None:
-        marker = defaultmarker 
-    else:
+        marker = defaultmarker
+    elif not isinstance(marker, bytes):
         marker = marker.encode()
     
     key = generate_password_key(password)
@@ -116,10 +117,10 @@ def embed_string(input_string, host_file_path, output_file_path, password=None, 
         password = defaultpassword 
     
     if marker is None:
-        marker = defaultmarker 
-    else:
+        marker = defaultmarker
+    elif not isinstance(marker, bytes):
         marker = marker.encode()
-        
+ 
     key = generate_password_key(password)
 
     with open(host_file_path, 'rb') as host_file:
@@ -143,10 +144,10 @@ def extract_string(host_file_path, password=None, marker=None):
         password = defaultpassword 
     
     if marker is None:
-        marker = defaultmarker 
-    else:
+        marker = defaultmarker
+    elif not isinstance(marker, bytes):
         marker = marker.encode()
-        
+
     key = generate_password_key(password)
 
     with open(host_file_path, 'rb') as host_file:
@@ -167,12 +168,12 @@ def extract_string(host_file_path, password=None, marker=None):
     return extracted_string
 
 def deembed_file(host_file_path, output_file_path, marker=None):
-    
-    if marker is None:
-        marker = defaultmarker 
-    else:
-        marker = marker.encode()
         
+    if marker is None:
+        marker = defaultmarker
+    elif not isinstance(marker, bytes):
+        marker = marker.encode()
+
     with open(host_file_path, 'rb') as host_file:
         host_data = host_file.read()
 
@@ -188,20 +189,29 @@ def deembed_file(host_file_path, output_file_path, marker=None):
     return output_file_path
 
 def process_extract_file(args):
-    return extract_file(args.host_file, args.password, marker=args.marker)
+    result = extract_file(args.host_file, args.password, marker=args.marker)
+    print(result)
+    return result
 
 def process_embed_file(args):
-    embed_file(args.input_file, args.host_file, args.output_file, args.password, marker=args.marker)
+    result = embed_file(args.input_file, args.host_file, args.output_file, args.password, marker=args.marker)
+    print(result)
+    return result
 
 def process_embed_string(args):
-    embed_string(args.input_string, args.host_file, args.output_file, args.password, marker=args.marker)
+    result = embed_string(args.input_string, args.host_file, args.output_file, args.password, marker=args.marker)
+    print(result)
+    return result
 
 def process_extract_string(args):
-    extract_string(args.host_file, args.password, marker=args.marker)
+    result = extract_string(args.host_file, args.password, marker=args.marker)
+    print(result)
+    return result
 
 def process_deembed_file(args):
-    deembed_file(args.host_file, args.output_file, marker=args.marker)
-
+    result = deembed_file(args.host_file, args.output_file, marker=args.marker)
+    print(result)
+    return result
 
 def main():
     parser = argparse.ArgumentParser(description='File embedding and extraction with AES encryption.')

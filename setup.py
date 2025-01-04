@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="mymra", 
-    version="1.4.9.2",  
+    version="1.4.9.3",  
     packages=find_packages(include=["mymra"]),
     install_requires=[
         'pycryptodome', 
