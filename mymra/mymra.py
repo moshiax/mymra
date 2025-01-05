@@ -179,7 +179,7 @@ def deembed_file(host_file_path, output_file_path, marker=None):
 
     marker_index = host_data.find(marker)
     if marker_index == -1:
-        raise ValueError(f"No embedded data found in {host_file_path}")
+        raise ValueError(f"Embedding marker not found in {host_file_path}")
 
     cleaned_data = host_data[:marker_index]
 
