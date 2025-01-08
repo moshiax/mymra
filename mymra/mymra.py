@@ -26,8 +26,25 @@ def decrypt_data(encrypted_data, key):
         raise ValueError("Decryption failed. Possible invalid data or key.") from e
     return decrypted_data
 
-def embed_file(input_file_path, host_file_path, output_file_path, password=None, marker=None):
-    
+def write_embedded_data(host_data, data_to_embed, marker, output_file_path):
+    end_marker = marker[::-1]
+    combined_data = host_data + marker + data_to_embed + end_marker
+    with open(output_file_path, 'wb') as output_file:
+        output_file.write(combined_data)
+    return output_file_path
+
+def extract_embedded_data(host_data, marker):
+    end_marker = marker[::-1]
+
+    start_marker_index = host_data.find(marker)
+    end_marker_index = host_data.find(end_marker)
+
+    if start_marker_index == -1 or end_marker_index == -1 or end_marker_index <= start_marker_index:
+        raise ValueError("Required markers not found or improperly placed in the host file. Extraction failed.")
+
+    return host_data[start_marker_index + len(marker):end_marker_index]
+
+def embed_string(input_string, host_file_path, output_file_path, password=None, marker=None):
     if password is None:
         password = defaultpassword 
     
@@ -36,9 +53,28 @@ def embed_file(input_file_path, host_file_path, output_file_path, password=None,
     elif not isinstance(marker, bytes):
         marker = marker.encode()
 
-    
     key = generate_password_key(password)
+
+    with open(host_file_path, 'rb') as host_file:
+        host_data = host_file.read()
+
+    if marker in host_data:
+        raise ValueError("The file already contains embedded data.")
+
+    encrypted_data = encrypt_data(input_string.encode(), key)
+    return write_embedded_data(host_data, encrypted_data, marker, output_file_path)
+
+def embed_file(input_file_path, host_file_path, output_file_path, password=None, marker=None):
+    if password is None:
+        password = defaultpassword 
     
+    if marker is None:
+        marker = defaultmarker
+    elif not isinstance(marker, bytes):
+        marker = marker.encode()
+
+    key = generate_password_key(password)
+
     with open(host_file_path, 'rb') as host_file:
         host_data = host_file.read()
 
@@ -55,15 +91,10 @@ def embed_file(input_file_path, host_file_path, output_file_path, password=None,
     encrypted_metadata = encrypt_data(metadata, key)
     encrypted_data = encrypt_data(input_data, key)
 
-    combined_data = host_data + marker + encrypted_metadata + marker + encrypted_data
+    combined_data = encrypted_metadata + marker + encrypted_data
+    return write_embedded_data(host_data, combined_data, marker, output_file_path)
 
-    with open(output_file_path, 'wb') as output_file:
-        output_file.write(combined_data)
-
-    return output_file_path
-
-def extract_file(host_file_path, password=None, marker=None):
-    
+def extract_string(host_file_path, password=None, marker=None):
     if password is None:
         password = defaultpassword 
     
@@ -71,123 +102,92 @@ def extract_file(host_file_path, password=None, marker=None):
         marker = defaultmarker
     elif not isinstance(marker, bytes):
         marker = marker.encode()
-    
+
     key = generate_password_key(password)
 
     with open(host_file_path, 'rb') as host_file:
         host_data = host_file.read()
 
-    marker_index = host_data.find(marker)
-    if marker_index == -1:
-        raise ValueError(f"Marker not found in {host_file_path}. Extraction failed.")
+    encrypted_data = extract_embedded_data(host_data, marker)
+    decrypted_data = decrypt_data(encrypted_data, key)
 
-    metadata_start = marker_index + len(marker)
-    metadata_end = host_data.find(marker, metadata_start)
-    if metadata_end == -1:
-        raise ValueError(f"End marker not found in {host_file_path}. Extraction failed.")
+    if decrypted_data is None:
+        raise ValueError("Failed to decrypt data with the given password.")
 
-    encrypted_metadata = host_data[metadata_start:metadata_end]
-    encrypted_data = host_data[metadata_end + len(marker):]
+    return decrypted_data.decode()
+
+def extract_file(host_file_path, password=None, marker=None):
+    if password is None:
+        password = defaultpassword 
+    
+    if marker is None:
+        marker = defaultmarker
+    elif not isinstance(marker, bytes):
+        marker = marker.encode()
+
+    key = generate_password_key(password)
+
+    with open(host_file_path, 'rb') as host_file:
+        host_data = host_file.read()
+
+    encrypted_combined_data = extract_embedded_data(host_data, marker)
+    metadata_marker_index = encrypted_combined_data.find(marker)
+
+    if metadata_marker_index == -1:
+        raise ValueError("Metadata marker not found. Extraction failed.")
+
+    encrypted_metadata = encrypted_combined_data[:metadata_marker_index]
+    encrypted_data = encrypted_combined_data[metadata_marker_index + len(marker):]
 
     decrypted_metadata = decrypt_data(encrypted_metadata, key)
     if decrypted_metadata is None:
-        raise ValueError(f"Failed to decrypt metadata from {host_file_path}.")
+        raise ValueError("Failed to decrypt metadata.")
 
     try:
         file_name, file_extension = decrypted_metadata.decode().split(':')
         if not file_extension:
             file_extension = 'DMM'
     except ValueError:
-        raise ValueError(f"Invalid metadata format in {host_file_path}.")
+        raise ValueError("Invalid metadata format.")
 
     file_name = f"{file_name}.{file_extension}" if not file_name.endswith(f".{file_extension}") else file_name
 
     decrypted_data = decrypt_data(encrypted_data, key)
     if decrypted_data is None:
-        raise ValueError(f"Failed to decrypt data from {host_file_path}.")
+        raise ValueError("Failed to decrypt data.")
 
     with open(file_name, 'wb') as output_file:
         output_file.write(decrypted_data)
 
     return file_name
-
-def embed_string(input_string, host_file_path, output_file_path, password=None, marker=None):
     
-    if password is None:
-        password = defaultpassword 
-    
-    if marker is None:
-        marker = defaultmarker
-    elif not isinstance(marker, bytes):
-        marker = marker.encode()
- 
-    key = generate_password_key(password)
-
-    with open(host_file_path, 'rb') as host_file:
-        host_data = host_file.read()
-
-    if marker in host_data:
-        raise ValueError("The file already contains embedded data.")
-
-    encrypted_data = encrypt_data(input_string.encode(), key)
-
-    combined_data = host_data + marker + encrypted_data
-
-    with open(output_file_path, 'wb') as output_file:
-        output_file.write(combined_data)
-
-    return output_file_path
-
-def extract_string(host_file_path, password=None, marker=None):
-    
-    if password is None:
-        password = defaultpassword 
-    
-    if marker is None:
-        marker = defaultmarker
-    elif not isinstance(marker, bytes):
-        marker = marker.encode()
-
-    key = generate_password_key(password)
-
-    with open(host_file_path, 'rb') as host_file:
-        host_data = host_file.read()
-
-    marker_index = host_data.find(marker)
-    if marker_index == -1:
-        raise ValueError(f"Marker not found in {host_file_path}. Extraction failed.")
-
-    encrypted_data = host_data[marker_index + len(marker):]
-
-    decrypted_data = decrypt_data(encrypted_data, key)
-    if decrypted_data is None:
-        raise ValueError(f"Failed to decrypt data from {host_file_path} with the given password.")
-
-    extracted_string = decrypted_data.decode()
-
-    return extracted_string
-
 def deembed_file(host_file_path, output_file_path, marker=None):
-        
     if marker is None:
         marker = defaultmarker
     elif not isinstance(marker, bytes):
         marker = marker.encode()
 
+    end_marker = marker[::-1]  
+
     with open(host_file_path, 'rb') as host_file:
         host_data = host_file.read()
 
-    marker_index = host_data.find(marker)
-    if marker_index == -1:
-        raise ValueError(f"Embedding marker not found in {host_file_path}")
+    start_marker_index = host_data.find(marker)
+    end_marker_index = host_data.find(end_marker)
 
-    cleaned_data = host_data[:marker_index]
+    if start_marker_index == -1:
+        raise ValueError(f"Embedding marker not found in {host_file_path}")
+    
+    if end_marker_index == -1 or end_marker_index <= start_marker_index:
+        raise ValueError(f"End marker not found or improperly placed in {host_file_path}")
+
+    cleaned_data = host_data[:start_marker_index] + host_data[end_marker_index + len(end_marker):]
 
     with open(output_file_path, 'wb') as output_file:
         output_file.write(cleaned_data)
 
     return output_file_path
-
+    
 def process_extract_file(args):
     result = extract_file(args.host_file, args.password, marker=args.marker)
     print(result)
