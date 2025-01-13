@@ -5,8 +5,7 @@ setup(
     version="1.4.9.8",  
     packages=find_packages(include=["mymra"]),
     install_requires=[
-        'pycryptodome', 
-        'argparse', 
+        'pycryptodome',
     ],
     description="A tool for embedding and extracting files and strings with AES encryption.",
     author = 'Oleg Beznogy',
