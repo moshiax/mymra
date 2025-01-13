@@ -84,8 +84,8 @@ def embed_file(input_file_path, host_file_path, output_file_path, password=None,
     with open(input_file_path, 'rb') as input_file:
         input_data = input_file.read()
 
-    file_name = os.path.basename(input_file_path)
-    file_extension = os.path.splitext(file_name)[1][1:] or "DMM"
+    file_name = os.path.splitext(os.path.basename(input_file_path))[0] 
+    file_extension = os.path.splitext(input_file_path)[1][1:] or 'noextension'
     metadata = f"{file_name}:{file_extension}".encode()
 
     encrypted_metadata = encrypt_data(metadata, key)
@@ -145,23 +145,27 @@ def extract_file(host_file_path, password=None, marker=None):
 
     try:
         file_name, file_extension = decrypted_metadata.decode().split(':')
-        if not file_extension:
-            file_extension = 'DMM'
     except ValueError:
         raise ValueError("Invalid metadata format.")
 
-    file_name = f"{file_name}.{file_extension}" if not file_name.endswith(f".{file_extension}") else file_name
+    if not file_extension or file_extension == 'noextension':
+        output_file_name = file_name
+    else:
+        if file_name.lower().endswith(f".{file_extension.lower()}"):
+            output_file_name = file_name
+        else:
+            output_file_name = f"{file_name}.{file_extension}"
 
     decrypted_data = decrypt_data(encrypted_data, key)
     if decrypted_data is None:
         raise ValueError("Failed to decrypt data.")
 
-    output_path = os.path.join(os.path.dirname(host_file_path), file_name)
+    output_path = os.path.join(os.path.dirname(host_file_path), output_file_name)
 
     with open(output_path, 'wb') as output_file:
         output_file.write(decrypted_data)
 
-    return output_path 
+    return output_path
 
 def analyze_file(host_file_path, password=None, marker=None):
 
@@ -286,7 +290,11 @@ def main():
     parser = argparse.ArgumentParser(description='File embedding and extraction with AES encryption.')
     subparsers = parser.add_subparsers()
 
-    embed_parser = subparsers.add_parser('embed', help='Embed a file into a host file')
+    embed_parser = subparsers.add_parser(
+        'embed', 
+        aliases=['embed_file'],
+        help='Embed a file into a host file'
+    )
     embed_parser.add_argument('input_file', help='Path to the file to embed')
     embed_parser.add_argument('host_file', help='Path to the host file')
     embed_parser.add_argument('output_file', help='Path to save the file with embedded data')
@@ -294,7 +302,11 @@ def main():
     embed_parser.add_argument('-m', '--marker', help='Marker for embedding data', default=defaultmarker)
     embed_parser.set_defaults(func=process_embed_file)
 
-    extract_parser = subparsers.add_parser('extract', help='Extract an embedded file from a host file')
+    extract_parser = subparsers.add_parser(
+        'extract', 
+        aliases=['extract_file'],
+        help='Extract an embedded file from a host file'
+    )
     extract_parser.add_argument('host_file', help='Path to the host file')
     extract_parser.add_argument('-p', '--password', help='Password for decryption', default=defaultpassword)
     extract_parser.add_argument('-m', '--marker', help='Marker for extracting data', default=defaultmarker)
@@ -314,13 +326,21 @@ def main():
     extract_string_parser.add_argument('-m', '--marker', help='Marker for extracting data', default=defaultmarker)
     extract_string_parser.set_defaults(func=process_extract_string)
 
-    deembed_parser = subparsers.add_parser('deembed', help='Remove embedded data from a host file')
+    deembed_parser = subparsers.add_parser(
+        'deembed', 
+        aliases=['deembed_file'],
+        help='Remove embedded data from a host file'
+    )
     deembed_parser.add_argument('host_file', help='Path to the host file')
     deembed_parser.add_argument('output_file', help='Path to save the cleaned host file')
     deembed_parser.add_argument('-m', '--marker', help='Marker for removing embedded data', default=defaultmarker)
     deembed_parser.set_defaults(func=process_deembed_file)
-
-    analyze_parser = subparsers.add_parser('analyze', help='Analyze a host file for embedded content')
+    
+    analyze_parser = subparsers.add_parser(
+        'analyze',
+        aliases=['analyze_file'],
+        help='Analyze a host file for embedded content'
+    )
     analyze_parser.add_argument('host_file', help='Path to the host file')
     analyze_parser.add_argument('-p', '--password', help='Password for decryption', default=defaultpassword)
     analyze_parser.add_argument('-m', '--marker', help='Marker for analyzing embedded data', default=defaultmarker)
