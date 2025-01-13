@@ -37,7 +37,8 @@ jobs:
             echo "First commit or no previous commit found."
             echo "Skipping version check."
             echo "version_changed=true" >> $GITHUB_ENV
-
+          fi
+          
       - name: Stop if no version change
         if: env.version_changed == 'false'
         run: |
