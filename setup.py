@@ -21,4 +21,4 @@ setup(
             'mymra=mymra.mymra:main', 
         ],
     },
-) 
+)
