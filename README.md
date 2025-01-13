@@ -1,5 +1,5 @@
 
-# AES File Embed/Extract
+# Mymra
 
 This project allows you to embed and extract files or strings within other files using AES encryption.
 
