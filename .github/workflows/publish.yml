@@ -19,6 +19,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Get diff for setup.py
+        id: diff
+        run: |
+          git diff HEAD^ HEAD setup.py > setup_diff.txt
+          if grep -q 'version=' setup_diff.txt; then
+            echo "Version change detected."
+            echo "version_changed=true" >> $GITHUB_ENV
+          else
+            echo "No version change detected. Skipping publish."
+            echo "version_changed=false" >> $GITHUB_ENV
+          fi
+
+      - name: Stop if no version change
+        if: env.version_changed == 'false'
+        run: |
+          echo "Workflow skipped as the version did not change."
+          exit 0
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
