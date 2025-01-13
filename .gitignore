@@ -2,3 +2,4 @@ build/*
 dist/*
 mymra/*.pyc
 /mymra.egg-info
+install.bat

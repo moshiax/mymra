@@ -163,6 +163,62 @@ def extract_file(host_file_path, password=None, marker=None):
 
     return output_path 
 
+def analyze_file(host_file_path, password=None, marker=None):
+
+    if password is None:
+        password = defaultpassword 
+    
+    if marker is None:
+        marker = defaultmarker
+    elif not isinstance(marker, bytes):
+        marker = marker.encode()
+
+    key = generate_password_key(password)
+    with open(host_file_path, 'rb') as host_file:
+        host_data = host_file.read()
+
+    try:
+        encrypted_combined_data = extract_embedded_data(host_data, marker)
+    except ValueError as e:
+        raise ValueError(f"No embedded data found: {e}")
+    
+    metadata_marker_index = encrypted_combined_data.find(marker)
+    if metadata_marker_index != -1:
+        encrypted_metadata = encrypted_combined_data[:metadata_marker_index]
+        encrypted_data = encrypted_combined_data[metadata_marker_index + len(marker):]
+
+        try:
+            decrypted_metadata = decrypt_data(encrypted_metadata, key)
+        except ValueError:
+            raise ValueError("Failed to decrypt metadata with the provided password.")
+
+        try:
+            file_name, file_extension = decrypted_metadata.decode().split(':', 1)
+        except ValueError:
+            raise ValueError("Invalid metadata format. Could not parse file name/extension.")
+        
+        try:
+            decrypted_file_data = decrypt_data(encrypted_data, key)
+        except ValueError:
+            raise ValueError("Failed to decrypt file data with the provided password.")
+
+        return {
+            'type': 'file',
+            'file_name': file_name,
+            'file_extension': file_extension,
+            'file_size': len(decrypted_file_data)
+        }
+    else:
+        try:
+            decrypted_data = decrypt_data(encrypted_combined_data, key)
+        except ValueError:
+            raise ValueError("Failed to decrypt string data with the provided password.")
+
+        return {
+            'type': 'string',
+            'value': decrypted_data.decode()
+        }
+        
 def deembed_file(host_file_path, output_file_path, marker=None):
     if marker is None:
         marker = defaultmarker
@@ -189,7 +245,7 @@ def deembed_file(host_file_path, output_file_path, marker=None):
         output_file.write(cleaned_data)
 
     return output_file_path
-    
+
 def process_extract_file(args):
     result = extract_file(args.host_file, args.password, marker=args.marker)
     print(result)
@@ -213,6 +269,17 @@ def process_extract_string(args):
 def process_deembed_file(args):
     result = deembed_file(args.host_file, args.output_file, marker=args.marker)
     print(result)
+    
+def process_analyze_file(args):
+    result = analyze_file(args.host_file, args.password, marker=args.marker)
+    if result['type'] == 'file':
+        print(f"Embedded content type: File")
+        print(f"File Name: {result['file_name']}")
+        print(f"File Extension: {result['file_extension']}")
+        print(f"File Size: {result['file_size']} bytes")
+    elif result['type'] == 'string':
+        print(f"Embedded content type: String")
+        print(f"Value: {result['value']}")
     return result
 
 def main():
@@ -253,12 +320,18 @@ def main():
     deembed_parser.add_argument('-m', '--marker', help='Marker for removing embedded data', default=defaultmarker)
     deembed_parser.set_defaults(func=process_deembed_file)
 
+    analyze_parser = subparsers.add_parser('analyze', help='Analyze a host file for embedded content')
+    analyze_parser.add_argument('host_file', help='Path to the host file')
+    analyze_parser.add_argument('-p', '--password', help='Password for decryption', default=defaultpassword)
+    analyze_parser.add_argument('-m', '--marker', help='Marker for analyzing embedded data', default=defaultmarker)
+    analyze_parser.set_defaults(func=process_analyze_file)
+
     args = parser.parse_args()
 
     if not vars(args):
         parser.print_help()
     else:
         args.func(args)
-        
+
 if __name__ == "__main__":
     main()

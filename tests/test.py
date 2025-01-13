@@ -1,6 +1,6 @@
 import os
 from colorama import Fore, Style, init
-from mymra import embed_file, extract_file, embed_string, extract_string, deembed_file
+from mymra import embed_file, extract_file, embed_string, extract_string, deembed_file, analyze_file
 
 #
 #    Password and marker arguments are always optional
@@ -64,6 +64,30 @@ try:
 except Exception as e:
     errors_occurred = True
     print(f"{Fore.RED}Extracting a string - Failed! Error: {e}{Style.RESET_ALL}")
+
+# Example of analyzing embedded file
+try:
+    analysis_result = analyze_file(
+        host_file_path='1488.png',
+        password='COCKER',
+        marker='ITSTEST'
+    )
+    print(f"{Fore.GREEN}Analyzing embedded data - Successful: {analysis_result}{Style.RESET_ALL}")
+except Exception as e:
+    errors_occurred = True
+    print(f"{Fore.RED}Analyzing embedded data - Failed! Error: {e}{Style.RESET_ALL}")
+
+# Example of analyzing embedded string
+try:
+    analysis_result = analyze_file(
+        host_file_path='string_embedded.png',
+        password='COCKER',
+        marker='ITSTEST'
+    )
+    print(f"{Fore.GREEN}Analyzing embedded data - Successful: {analysis_result}{Style.RESET_ALL}")
+except Exception as e:
+    errors_occurred = True
+    print(f"{Fore.RED}Analyzing embedded data - Failed! Error: {e}{Style.RESET_ALL}")
 
 # Example of removing embedded data
 try:

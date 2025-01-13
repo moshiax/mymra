@@ -80,20 +80,44 @@ print(string)
 ```
 
 #### Deembedding
-Removes embedded data from a file
+Remove embedded data from a file:
 
 ```python
 from mymra import deembed_file
 
 output_path = deembed_file(
     host_file_path='123.png',      # File with embedded data
-	output_file_path='321.png', # Path to save file
-    password='COCKER',             # Optional password
-    marker='ITSTEST'          # Optional marker
+    output_file_path='321.png',    # Path to save cleaned file
+    marker='ITSTEST'               # Optional marker
 )
 
 print(output_path)
 ```
+
+#### Analyzing a File
+Analyze a host file to determine the embedded content type, metadata, or content:
+
+```python
+from mymra import analyze_file
+
+# Analyze a file containing an embedded file
+result = analyze_file(
+    host_file_path='1488.png',  # File containing embedded data
+    password='COCKER',          # Optional password
+    marker='ITSTEST'            # Optional marker
+)
+
+if result['type'] == 'file':
+    print("Embedded file details:")
+    print(f"Name: {result['file_name']}")
+    print(f"Extension: {result['file_extension']}")
+    print(f"Size: {result['file_size']} bytes")
+elif result['type'] == 'string':
+    print("Embedded string content:")
+    print(result['value'])
+```
+
+---
 
 ### Command-Line Interface
 
@@ -125,4 +149,29 @@ mymra extract_string string_embedded.png -p COCKER -m ITSTEST
 Remove embedded data from a file:
 ```bash
 mymra deembed 1488.png cleaned_123.png -m ITSTEST
+```
+
+#### Analyzing a File
+Analyze a host file to identify embedded content:
+
+- **Analyzing a file containing an embedded file**:
+```bash
+mymra analyze 1488.png -p COCKER -m ITSTEST
+```
+Expected output:
+```
+Embedded file details:
+Name: example.mp4
+Extension: mp4
+Size: 1048576 bytes
+```
+
+- **Analyzing a file containing an embedded string**:
+```bash
+mymra analyze string_embedded.png -p COCKER -m ITSTEST
+```
+Expected output:
+```
+Embedded string content:
+This is a secret string
 ```

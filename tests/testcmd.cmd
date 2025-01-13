@@ -13,6 +13,15 @@ if %errorlevel% neq 0 (
     echo [SUCCESS] Embedding a file - Successful
 )
 
+:: Analyzing a file containing embedded file
+mymra analyze 1488.png -p %password% -m %marker%
+if %errorlevel% neq 0 (
+    echo [ERROR] Analyzing a file containing embedded file - Failed!
+    set /a errors+=1
+) else (
+    echo [SUCCESS] Analyzing a file containing embedded file - Successful
+)
+
 :: Extracting a file
 mymra extract 1488.png -p %password% -m %marker%
 if %errorlevel% neq 0 (
@@ -29,6 +38,15 @@ if %errorlevel% neq 0 (
     set /a errors+=1
 ) else (
     echo [SUCCESS] Embedding a string - Successful
+)
+
+:: Analyzing a file containing embedded string
+mymra analyze string_embedded.png -p %password% -m %marker%
+if %errorlevel% neq 0 (
+    echo [ERROR] Analyzing a file containing embedded string - Failed!
+    set /a errors+=1
+) else (
+    echo [SUCCESS] Analyzing a file containing embedded string - Successful
 )
 
 :: Extracting a string
@@ -60,7 +78,3 @@ if %errors% neq 0 (
     echo [SUCCESS] Test completed successfully.
     exit /b 0
 )
-
-
-echo Test completed.
-
