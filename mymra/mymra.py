@@ -161,7 +161,7 @@ def extract_file(host_file_path, password=None, marker=None):
     with open(output_path, 'wb') as output_file:
         output_file.write(decrypted_data)
 
-    return file_path 
+    return output_path 
 
 def deembed_file(host_file_path, output_file_path, marker=None):
     if marker is None:
