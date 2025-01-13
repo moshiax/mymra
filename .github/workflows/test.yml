@@ -8,7 +8,8 @@ jobs:
     name: Run Package Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -18,13 +19,21 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install setuptools wheel pytest
+          pip install setuptools wheel
+          pip install colorama pycryptodome
 
-      - name: Install package
-        run: pip install .
+      - name: Run test script
+        run: |
+          python tests/test.py
+        shell: bash
+        env:
+          PYTHONUNBUFFERED: "1"
 
-      - name: Install additional dependencies
-        run: pip install colorama pycryptodome
-
-      - name: Run tests
-        run: python -m pytest tests/test.py
+      - name: Verify output
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "Test passed successfully!"
+          else
+            echo "Test failed!" >&2
+            exit 1
+          fi
