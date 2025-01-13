@@ -11,6 +11,7 @@ from mymra import embed_file, extract_file, embed_string, extract_string, deembe
 init()
 
 errors_occurred = False
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 # Example of embedding a file
 try:
