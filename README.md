@@ -1,116 +1,128 @@
+
 # AES File Embed/Extract
 
 This project allows you to embed and extract files or strings within other files using AES encryption.
 
-## Installing dependencies
+## Installation
 
-First, make sure you have all the necessary dependencies installed:
+Install the necessary dependencies:
 
 ```bash
 pip install pycryptodome
 ```
 
-## Use as a command tool
+## Usage Examples
 
-### Embedding a file in a storage file
+### Library Functions
 
-To embed a file within another file using AES encryption, run the command:
-
-```bash
-mymra embed <input_file> <host_file> <output_file> -p <password>
-```
-
-**Options**:
-- `<input_file>` — path to the file that needs to be embedded.
-- `<host_file>` — path to the storage file that will contain the embedded file.
-- `<output_file>` — path to save the file with embedded data.
-- `-p <password>` - (optional) encryption password (default: `RAMRANCHREALLYROCKS`)
-
-### Retrieving a file from file storage
-
-To retrieve a file from storage using AES encryption, run the command:
-
-```bash
-mymra extract <host_file> -p <password>
-```
-
-**Options**:
-- `<host_file>` — path to the storage file containing embedded data.
-- `-p <password>` - (optional) decryption password (default: `RAMRANCHREALLYROCKS`)
-
-## Example as a library
-
-You can use the file embedding and extracting functionality as a library by importing the appropriate functions.
-
-First, install it. Run
-
-```bash
-pip install .
-```
-
-now you can work with it like with a library
+#### Embedding a File
+Embed a file into a host file:
 
 ```python
-from mymra import embed_file, extract_file
+from mymra import embed_file
 
-# Example of embedding a file
-embed_file('123.mp4', '123.png', '1488.png', 'COCKER')
+output_path = embed_file(
+    input_file_path='123.mp4',  # File to embed
+    host_file_path='123.png',   # Host file
+    output_file_path='1488.png',  # Path to save file with embedded data
+    password='COCKER',          # Optional password
+    marker='ITSTEST'            # Optional marker
+)
 
-# Example of extracting a file
-extract_file('1488.png', 'COCKER')
+print(output_path)
 ```
 
-## Example as cmd
+#### Extracting a File
+Extract an embedded file from a host file:
 
-1. Embed the file `123.mp4` into the file `123.png` with the password `COCKER` and save it in `1488.png`:
+```python
+from mymra import extract_file
 
+output_path = extract_file(
+    host_file_path='1488.png',  # File containing embedded data
+    password='COCKER',          # Optional password
+    marker='ITSTEST'            # Optional marker
+)
+
+print(output_path)
+```
+
+#### Embedding a string
+Embed a string into a host file:
+
+```python
+from mymra import embed_string
+
+file_path = embed_string(
+    input_string='secret',  # String to embed
+    host_file_path='123.png',      # Host file
+    output_file_path='output.png', # Path to save file with embedded string
+    password='COCKER',             # Optional password
+    marker='ITSTEST'          # Optional marker
+)
+
+print(file_path)
+```
+
+#### Extracting a string
+Extract a string from file:
+
+```python
+from mymra import extract_string
+
+string = extract_string(
+    host_file_path='output.png',      # File with embedded string
+    password='COCKER',             # Optional password
+    marker='ITSTEST'          # Optional marker
+)
+
+print(string)
+```
+
+#### Deembedding
+Removes embedded data from a file
+
+```python
+from mymra import deembed_file
+
+output_path = deembed_file(
+    host_file_path='123.png',      # File with embedded data
+	output_file_path='321.png', # Path to save file
+    password='COCKER',             # Optional password
+    marker='ITSTEST'          # Optional marker
+)
+
+print(output_path)
+```
+
+### Command-Line Interface
+
+#### Embedding a File
+Embed a file with optional arguments:
 ```bash
-mymra embed 123.mp4 123.png 1488.png -p COCKER
+mymra embed 123.mp4 123.png 1488.png -p COCKER -m ITSTEST
 ```
 
-2. Extract the file from `1488.png` with the password `COCKER`:
-
+#### Extracting a File
+Extract an embedded file using optional arguments:
 ```bash
-mymra extract 1488.png -p COCKER
+mymra extract 1488.png -p COCKER -m ITSTEST
 ```
 
-
-### Embedding a string in a storage file
-
-To embed a string within another file using AES encryption, run the command:
-
+#### Embedding a String
+Embed a string into a host file:
 ```bash
-mymra embed_string <input_string> <host_file> <output_file> -p <password>
+mymra embed_string "Secret Data" 123.png string_embedded.png -p COCKER -m ITSTEST
 ```
 
-**Options**:
-- `<input_string>` — the string to embed.
-- `<host_file>` — path to the storage file that will contain the embedded string.
-- `<output_file>` — path to save the file with embedded data.
-- `-p <password>` - (optional) encryption password (default: `RAMRANCHREALLYROCKS`)
-
-### Retrieving a string from a storage file
-
-To retrieve an embedded string from storage using AES decryption, run the command:
-
+#### Extracting a String
+Extract a string from a host file:
 ```bash
-mymra extract_string <host_file> -p <password>
+mymra extract_string string_embedded.png -p COCKER -m ITSTEST
 ```
 
-**Options**:
-- `<host_file>` — path to the storage file containing the embedded string.
-- `-p <password>` - (optional) decryption password (default: `RAMRANCHREALLYROCKS`)
-
-### Removing embedded data from a file
-
-To remove all embedded data from a file and restore it to its original state, run the command:
-
+#### Removing Embedded Data
+Remove embedded data from a file:
 ```bash
-mymra deembed <host_file> <output_file>
+mymra deembed 1488.png cleaned_123.png -m ITSTEST
 ```
-
-**Options**:
-- `<host_file>` — path to the storage file containing embedded data.
-- `<output_file>` — path to save the cleaned file.
-
-More detailed examples in test.py

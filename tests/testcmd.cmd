@@ -1,52 +1,51 @@
 @echo off
 
-:: Define the marker
 set marker=ITSTEST
+set password=COCKER
 
 :: Embedding a file
-mymra embed 123.mp4 123.png 1488.png -p COCKER -m %marker%
+mymra embed 123.mp4 123.png 1488.png -p %password% -m %marker%
 if %errorlevel% neq 0 (
-    echo Embedding a file - Failed!
+    echo [ERROR] Embedding a file - Failed!
 ) else (
-    echo Embedding a file - Successful
+    echo [SUCCESS] Embedding a file - Successful
 )
 
 :: Extracting a file
-mymra extract 1488.png -p COCKER -m %marker%
+mymra extract 1488.png -p %password% -m %marker%
 if %errorlevel% neq 0 (
-    echo Extracting a file - Failed!
+    echo [ERROR] Extracting a file - Failed!
 ) else (
-    echo Extracting a file - Successful
+    echo [SUCCESS] Extracting a file - Successful
 )
 
 :: Embedding a string
-mymra embed_string "This is a secret string" 123.png string_embedded.png -p COCKER -m %marker%
+mymra embed_string "This is a secret string" 123.png string_embedded.png -p %password% -m %marker%
 if %errorlevel% neq 0 (
-    echo Embedding a string - Failed!
+    echo [ERROR] Embedding a string - Failed!
 ) else (
-    echo Embedding a string - Successful
+    echo [SUCCESS] Embedding a string - Successful
 )
 
 :: Extracting a string
-mymra extract_string string_embedded.png -p COCKER -m %marker%
+mymra extract_string string_embedded.png -p %password% -m %marker%
 if %errorlevel% neq 0 (
-    echo Extracting a string - Failed!
+    echo [ERROR] Extracting a string - Failed!
 ) else (
-    echo Extracting a string - Successful
+    echo [SUCCESS] Extracting a string - Successful
 )
 
 :: Removing embedded data
 mymra deembed 1488.png cleaned_123.png -m %marker%
 if %errorlevel% neq 0 (
-    echo Removing embedded data - Failed!
+    echo [ERROR] Removing embedded data - Failed!
 ) else (
-    echo Removing embedded data - Successful
+    echo [SUCCESS] Removing embedded data - Successful
 )
 
-:: Clean up files
-echo Cleaning up files...
-del /f /q cleaned_123.png
-del /f /q 1488.png
-del /f /q string_embedded.png
+del /f /q cleaned_123.png 2>nul
+del /f /q 1488.png 2>nul
+del /f /q string_embedded.png 2>nul
 
 echo Test completed.
+

@@ -156,11 +156,13 @@ def extract_file(host_file_path, password=None, marker=None):
     if decrypted_data is None:
         raise ValueError("Failed to decrypt data.")
 
-    with open(file_name, 'wb') as output_file:
+    output_path = os.path.join(os.path.dirname(host_file_path), file_name)
+
+    with open(output_path, 'wb') as output_file:
         output_file.write(decrypted_data)
 
-    return file_name
-    
+    return file_path 
+
 def deembed_file(host_file_path, output_file_path, marker=None):
     if marker is None:
         marker = defaultmarker
