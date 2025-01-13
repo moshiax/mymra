@@ -10,6 +10,8 @@ from mymra import embed_file, extract_file, embed_string, extract_string, deembe
 
 init()
 
+errors_occurred = False
+
 # Example of embedding a file
 try:
     embed_file(
@@ -21,6 +23,7 @@ try:
     )
     print(f"{Fore.GREEN}Embedding a file - Successful{Style.RESET_ALL}")
 except Exception as e:
+    errors_occurred = True
     print(f"{Fore.RED}Embedding a file - Failed! Error: {e}{Style.RESET_ALL}")
 
 # Example of extracting a file
@@ -32,6 +35,7 @@ try:
     )
     print(f"{Fore.GREEN}Extracting a file - Successful: {file_path}{Style.RESET_ALL}")
 except Exception as e:
+    errors_occurred = True
     print(f"{Fore.RED}Extracting a file - Failed! Error: {e}{Style.RESET_ALL}")
 
 # Example of embedding a string
@@ -45,6 +49,7 @@ try:
     )
     print(f"{Fore.GREEN}Embedding a string - Successful{Style.RESET_ALL}")
 except Exception as e:
+    errors_occurred = True
     print(f"{Fore.RED}Embedding a string - Failed! Error: {e}{Style.RESET_ALL}")
 
 # Example of extracting a string
@@ -56,6 +61,7 @@ try:
     )
     print(f"{Fore.GREEN}Extracting a string - Successful: {result}{Style.RESET_ALL}")
 except Exception as e:
+    errors_occurred = True
     print(f"{Fore.RED}Extracting a string - Failed! Error: {e}{Style.RESET_ALL}")
 
 # Example of removing embedded data
@@ -67,6 +73,7 @@ try:
     )
     print(f"{Fore.GREEN}Removing embedded data - Successful{Style.RESET_ALL}")
 except Exception as e:
+    errors_occurred = True
     print(f"{Fore.RED}Removing embedded data - Failed! Error: {e}{Style.RESET_ALL}")
 
 try:
@@ -74,4 +81,12 @@ try:
     os.remove('1488.png')
     os.remove('string_embedded.png')
 except OSError as e:
+    errors_occurred = True
     print(f"{Fore.YELLOW}Warning: {e}{Style.RESET_ALL}")
+
+if errors_occurred:
+    print(f"{Fore.RED}Errors occurred during execution{Style.RESET_ALL}")
+    exit(1)  
+else:
+    print(f"{Fore.GREEN}Execution completed successfully{Style.RESET_ALL}")
+    exit(0)

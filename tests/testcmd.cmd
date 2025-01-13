@@ -2,11 +2,13 @@
 
 set marker=ITSTEST
 set password=COCKER
+set errors=0
 
 :: Embedding a file
 mymra embed 123.mp4 123.png 1488.png -p %password% -m %marker%
 if %errorlevel% neq 0 (
     echo [ERROR] Embedding a file - Failed!
+    set /a errors+=1
 ) else (
     echo [SUCCESS] Embedding a file - Successful
 )
@@ -15,6 +17,7 @@ if %errorlevel% neq 0 (
 mymra extract 1488.png -p %password% -m %marker%
 if %errorlevel% neq 0 (
     echo [ERROR] Extracting a file - Failed!
+    set /a errors+=1
 ) else (
     echo [SUCCESS] Extracting a file - Successful
 )
@@ -23,6 +26,7 @@ if %errorlevel% neq 0 (
 mymra embed_string "This is a secret string" 123.png string_embedded.png -p %password% -m %marker%
 if %errorlevel% neq 0 (
     echo [ERROR] Embedding a string - Failed!
+    set /a errors+=1
 ) else (
     echo [SUCCESS] Embedding a string - Successful
 )
@@ -31,6 +35,7 @@ if %errorlevel% neq 0 (
 mymra extract_string string_embedded.png -p %password% -m %marker%
 if %errorlevel% neq 0 (
     echo [ERROR] Extracting a string - Failed!
+    set /a errors+=1
 ) else (
     echo [SUCCESS] Extracting a string - Successful
 )
@@ -39,6 +44,7 @@ if %errorlevel% neq 0 (
 mymra deembed 1488.png cleaned_123.png -m %marker%
 if %errorlevel% neq 0 (
     echo [ERROR] Removing embedded data - Failed!
+    set /a errors+=1
 ) else (
     echo [SUCCESS] Removing embedded data - Successful
 )
@@ -46,6 +52,15 @@ if %errorlevel% neq 0 (
 del /f /q cleaned_123.png 2>nul
 del /f /q 1488.png 2>nul
 del /f /q string_embedded.png 2>nul
+
+if %errors% neq 0 (
+    echo [ERROR] Test completed with %errors% errors.
+    exit /b 1
+) else (
+    echo [SUCCESS] Test completed successfully.
+    exit /b 0
+)
+
 
 echo Test completed.
 
