@@ -5,10 +5,10 @@ This project allows you to embed and extract files or strings within other files
 
 ## Installation
 
-Install the necessary dependencies:
+Install library:
 
 ```bash
-pip install pycryptodome
+pip install mymra
 ```
 
 ## Usage Examples
