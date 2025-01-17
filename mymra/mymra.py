@@ -4,6 +4,9 @@ from hashlib import sha256
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 from Crypto.Random import get_random_bytes
+import logging
+logger = logging.getLogger(__name__)
+
 
 defaultmarker = b'MQAZWERPASDZXW'
 defaultpassword = 'RAMRANCHREALLYROCKS'
@@ -229,7 +232,7 @@ def deembed_file(host_file_path, output_file_path, marker=None):
     elif not isinstance(marker, bytes):
         marker = marker.encode()
 
-    end_marker = marker[::-1]  
+    end_marker = marker[::-1]
 
     with open(host_file_path, 'rb') as host_file:
         host_data = host_file.read()
@@ -237,11 +240,11 @@ def deembed_file(host_file_path, output_file_path, marker=None):
     start_marker_index = host_data.find(marker)
     end_marker_index = host_data.find(end_marker)
 
-    if start_marker_index == -1:
-        raise ValueError(f"Embedding marker not found in {host_file_path}")
-    
-    if end_marker_index == -1 or end_marker_index <= start_marker_index:
-        raise ValueError(f"End marker not found or improperly placed in {host_file_path}")
+    if start_marker_index == -1 or end_marker_index == -1 or end_marker_index <= start_marker_index:
+        logger.debug(f"Marker not found or improperly placed in {host_file_path}. File will be copied without modification.")
+        with open(output_file_path, 'wb') as output_file:
+            output_file.write(host_data)
+        return output_file_path
 
     cleaned_data = host_data[:start_marker_index] + host_data[end_marker_index + len(end_marker):]
 
