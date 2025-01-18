@@ -2,10 +2,11 @@
 
 set marker=ITSTEST
 set password=COCKER
+set xor_key=123
 set errors=0
 
 :: Embedding a file
-mymra embed 123.mp4 123.png 1488.png -p %password% -m %marker%
+mymra embed 123.mp4 123.png 1488.png -p %password% -m %marker% -xor %xor_key%
 if %errorlevel% neq 0 (
     echo [ERROR] Embedding a file - Failed!
     set /a errors+=1
@@ -14,7 +15,7 @@ if %errorlevel% neq 0 (
 )
 
 :: Analyzing a file containing embedded file
-mymra analyze 1488.png -p %password% -m %marker%
+mymra analyze 1488.png -p %password% -m %marker% -xor %xor_key%
 if %errorlevel% neq 0 (
     echo [ERROR] Analyzing a file containing embedded file - Failed!
     set /a errors+=1
@@ -23,7 +24,7 @@ if %errorlevel% neq 0 (
 )
 
 :: Extracting a file
-mymra extract 1488.png -p %password% -m %marker%
+mymra extract 1488.png -p %password% -m %marker% -xor %xor_key%
 if %errorlevel% neq 0 (
     echo [ERROR] Extracting a file - Failed!
     set /a errors+=1
@@ -32,7 +33,7 @@ if %errorlevel% neq 0 (
 )
 
 :: Embedding a string
-mymra embed_string "This is a secret string" 123.png string_embedded.png -p %password% -m %marker%
+mymra embed_string "This is a secret string" 123.png string_embedded.png -p %password% -m %marker% -xor %xor_key%
 if %errorlevel% neq 0 (
     echo [ERROR] Embedding a string - Failed!
     set /a errors+=1
@@ -41,7 +42,7 @@ if %errorlevel% neq 0 (
 )
 
 :: Analyzing a file containing embedded string
-mymra analyze string_embedded.png -p %password% -m %marker%
+mymra analyze string_embedded.png -p %password% -m %marker% -xor %xor_key%
 if %errorlevel% neq 0 (
     echo [ERROR] Analyzing a file containing embedded string - Failed!
     set /a errors+=1
@@ -50,7 +51,7 @@ if %errorlevel% neq 0 (
 )
 
 :: Extracting a string
-mymra extract_string string_embedded.png -p %password% -m %marker%
+mymra extract_string string_embedded.png -p %password% -m %marker% -xor %xor_key%
 if %errorlevel% neq 0 (
     echo [ERROR] Extracting a string - Failed!
     set /a errors+=1
@@ -59,7 +60,7 @@ if %errorlevel% neq 0 (
 )
 
 :: Removing embedded data
-mymra deembed 1488.png cleaned_123.png -m %marker%
+mymra deembed 1488.png cleaned_123.png -m %marker% -xor %xor_key%
 if %errorlevel% neq 0 (
     echo [ERROR] Removing embedded data - Failed!
     set /a errors+=1

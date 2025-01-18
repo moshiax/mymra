@@ -3,9 +3,10 @@ from colorama import Fore, Style, init
 from mymra import embed_file, extract_file, embed_string, extract_string, deembed_file, analyze_file
 
 #
-#    Password and marker arguments are always optional
+#    Password, marker and xor_key arguments are always optional
 #    If not passed, used marker is b'MQAZWERPASDZXW'
 #    If not passed, used password is 'RAMRANCHREALLYROCKS'
+#    If not passed, used xor key is b'\x5A\x3C\x7E\x1F'
 #
 
 init()
@@ -20,7 +21,8 @@ try:
         host_file_path='123.png',
         output_file_path='1488.png',
         password='COCKER',
-        marker='ITSTEST'
+        marker='ITSTEST',
+        xor_key='123'
     )
     print(f"{Fore.GREEN}Embedding a file - Successful{Style.RESET_ALL}")
 except Exception as e:
@@ -32,7 +34,8 @@ try:
     file_path = extract_file(
         host_file_path='1488.png',
         password='COCKER',
-        marker='ITSTEST'
+        marker='ITSTEST',
+        xor_key='123'
     )
     print(f"{Fore.GREEN}Extracting a file - Successful: {file_path}{Style.RESET_ALL}")
 except Exception as e:
@@ -46,7 +49,8 @@ try:
         host_file_path='123.png',
         output_file_path='string_embedded.png',
         password='COCKER',
-        marker='ITSTEST'
+        marker='ITSTEST',
+        xor_key='123'
     )
     print(f"{Fore.GREEN}Embedding a string - Successful{Style.RESET_ALL}")
 except Exception as e:
@@ -58,7 +62,8 @@ try:
     result = extract_string(
         host_file_path='string_embedded.png',
         password='COCKER',
-        marker='ITSTEST'
+        marker='ITSTEST',
+        xor_key='123'
     )
     print(f"{Fore.GREEN}Extracting a string - Successful: {result}{Style.RESET_ALL}")
 except Exception as e:
@@ -70,7 +75,8 @@ try:
     analysis_result = analyze_file(
         host_file_path='1488.png',
         password='COCKER',
-        marker='ITSTEST'
+        marker='ITSTEST',
+        xor_key='123'
     )
     print(f"{Fore.GREEN}Analyzing embedded data - Successful: {analysis_result}{Style.RESET_ALL}")
 except Exception as e:
@@ -82,7 +88,8 @@ try:
     analysis_result = analyze_file(
         host_file_path='string_embedded.png',
         password='COCKER',
-        marker='ITSTEST'
+        marker='ITSTEST',
+        xor_key='123'
     )
     print(f"{Fore.GREEN}Analyzing embedded data - Successful: {analysis_result}{Style.RESET_ALL}")
 except Exception as e:
@@ -94,7 +101,8 @@ try:
     deembed_file(
         host_file_path='1488.png',
         output_file_path='cleaned_123.png',
-        marker='ITSTEST'
+        marker='ITSTEST',
+        xor_key='123'
     )
     print(f"{Fore.GREEN}Removing embedded data - Successful{Style.RESET_ALL}")
 except Exception as e:
@@ -111,7 +119,7 @@ except OSError as e:
 
 if errors_occurred:
     print(f"{Fore.RED}Errors occurred during execution{Style.RESET_ALL}")
-    exit(1)  
+    exit(1)
 else:
     print(f"{Fore.GREEN}Execution completed successfully{Style.RESET_ALL}")
     exit(0)

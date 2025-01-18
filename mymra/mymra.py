@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 defaultmarker = b'MQAZWERPASDZXW'
 defaultpassword = 'RAMRANCHREALLYROCKS'
+default_xor_key = b'\x5A\x3C\x7E\x1F'
 
 def generate_password_key(password):
     return sha256(password.encode()).digest()
@@ -38,7 +39,7 @@ def write_embedded_data(host_data, data_to_embed, marker, output_file_path):
 
 def extract_embedded_data(host_data, marker):
     end_marker = marker[::-1]
-
+    
     start_marker_index = host_data.find(marker)
     end_marker_index = host_data.find(end_marker)
 
@@ -47,15 +48,29 @@ def extract_embedded_data(host_data, marker):
 
     return host_data[start_marker_index + len(marker):end_marker_index]
 
-def embed_string(input_string, host_file_path, output_file_path, password=None, marker=None):
-    if password is None:
-        password = defaultpassword 
-    
+def prepare_marker(marker=None, xor_key=None):
+
     if marker is None:
         marker = defaultmarker
-    elif not isinstance(marker, bytes):
-        marker = marker.encode()
 
+    if xor_key is None:
+        xor_key = default_xor_key
+    elif isinstance(xor_key, str):
+        xor_key = xor_key.encode()
+
+    if isinstance(marker, str):
+        marker_bytes = marker.encode()
+    elif isinstance(marker, bytes):
+        marker_bytes = marker
+
+    marker = bytes(b ^ xor_key[i % len(xor_key)] for i, b in enumerate(marker_bytes))
+    return marker
+
+def embed_string(input_string, host_file_path, output_file_path, password=None, marker=None, xor_key=None):
+    if password is None:
+        password = defaultpassword 
+
+    marker = prepare_marker(marker, xor_key=xor_key)
     key = generate_password_key(password)
 
     with open(host_file_path, 'rb') as host_file:
@@ -67,15 +82,11 @@ def embed_string(input_string, host_file_path, output_file_path, password=None, 
     encrypted_data = encrypt_data(input_string.encode(), key)
     return write_embedded_data(host_data, encrypted_data, marker, output_file_path)
 
-def embed_file(input_file_path, host_file_path, output_file_path, password=None, marker=None):
+def embed_file(input_file_path, host_file_path, output_file_path, password=None, marker=None, xor_key=None):
     if password is None:
         password = defaultpassword 
-    
-    if marker is None:
-        marker = defaultmarker
-    elif not isinstance(marker, bytes):
-        marker = marker.encode()
 
+    marker = prepare_marker(marker, xor_key=xor_key)
     key = generate_password_key(password)
 
     with open(host_file_path, 'rb') as host_file:
@@ -97,15 +108,11 @@ def embed_file(input_file_path, host_file_path, output_file_path, password=None,
     combined_data = encrypted_metadata + marker + encrypted_data
     return write_embedded_data(host_data, combined_data, marker, output_file_path)
 
-def extract_string(host_file_path, password=None, marker=None):
+def extract_string(host_file_path, password=None, marker=None, xor_key=None):
     if password is None:
         password = defaultpassword 
     
-    if marker is None:
-        marker = defaultmarker
-    elif not isinstance(marker, bytes):
-        marker = marker.encode()
-
+    marker = prepare_marker(marker, xor_key=xor_key)
     key = generate_password_key(password)
 
     with open(host_file_path, 'rb') as host_file:
@@ -119,15 +126,11 @@ def extract_string(host_file_path, password=None, marker=None):
 
     return decrypted_data.decode()
 
-def extract_file(host_file_path, password=None, marker=None):
+def extract_file(host_file_path, password=None, marker=None, xor_key=None):
     if password is None:
         password = defaultpassword 
     
-    if marker is None:
-        marker = defaultmarker
-    elif not isinstance(marker, bytes):
-        marker = marker.encode()
-
+    marker = prepare_marker(marker, xor_key=xor_key)
     key = generate_password_key(password)
 
     with open(host_file_path, 'rb') as host_file:
@@ -170,17 +173,13 @@ def extract_file(host_file_path, password=None, marker=None):
 
     return output_path
 
-def analyze_file(host_file_path, password=None, marker=None):
-
+def analyze_file(host_file_path, password=None, marker=None, xor_key=None):
     if password is None:
         password = defaultpassword 
     
-    if marker is None:
-        marker = defaultmarker
-    elif not isinstance(marker, bytes):
-        marker = marker.encode()
-
+    marker = prepare_marker(marker, xor_key=xor_key)
     key = generate_password_key(password)
+    
     with open(host_file_path, 'rb') as host_file:
         host_data = host_file.read()
 
@@ -225,13 +224,10 @@ def analyze_file(host_file_path, password=None, marker=None):
             'type': 'string',
             'value': decrypted_data.decode()
         }
-        
-def deembed_file(host_file_path, output_file_path, marker=None):
-    if marker is None:
-        marker = defaultmarker
-    elif not isinstance(marker, bytes):
-        marker = marker.encode()
 
+def deembed_file(host_file_path, output_file_path, marker=None, xor_key=None):
+    
+    marker = prepare_marker(marker, xor_key=xor_key)
     end_marker = marker[::-1]
 
     with open(host_file_path, 'rb') as host_file:
@@ -252,33 +248,34 @@ def deembed_file(host_file_path, output_file_path, marker=None):
         output_file.write(cleaned_data)
 
     return output_file_path
-
+    
 def process_extract_file(args):
-    result = extract_file(args.host_file, args.password, marker=args.marker)
+    result = extract_file(args.host_file, args.password, marker=args.marker, xor_key=args.xor)
     print(result)
     return result
 
 def process_embed_file(args):
-    result = embed_file(args.input_file, args.host_file, args.output_file, args.password, marker=args.marker)
+    result = embed_file(args.input_file, args.host_file, args.output_file, args.password, marker=args.marker, xor_key=args.xor)
     print(result)
     return result
 
 def process_embed_string(args):
-    result = embed_string(args.input_string, args.host_file, args.output_file, args.password, marker=args.marker)
+    result = embed_string(args.input_string, args.host_file, args.output_file, args.password, marker=args.marker, xor_key=args.xor)
     print(result)
     return result
 
 def process_extract_string(args):
-    result = extract_string(args.host_file, args.password, marker=args.marker)
+    result = extract_string(args.host_file, args.password, marker=args.marker, xor_key=args.xor)
     print(result)
     return result
 
 def process_deembed_file(args):
-    result = deembed_file(args.host_file, args.output_file, marker=args.marker)
+    result = deembed_file(args.host_file, args.output_file, marker=args.marker, xor_key=args.xor)
     print(result)
-    
+    return result
+
 def process_analyze_file(args):
-    result = analyze_file(args.host_file, args.password, marker=args.marker)
+    result = analyze_file(args.host_file, args.password, marker=args.marker, xor_key=args.xor)
     if result['type'] == 'file':
         print(f"Embedded content type: File")
         print(f"File Name: {result['file_name']}")
@@ -303,6 +300,7 @@ def main():
     embed_parser.add_argument('output_file', help='Path to save the file with embedded data')
     embed_parser.add_argument('-p', '--password', help='Password for encryption', default=defaultpassword)
     embed_parser.add_argument('-m', '--marker', help='Marker for embedding data', default=defaultmarker)
+    embed_parser.add_argument('-xor', help='Custom XOR key for marker', default=None)
     embed_parser.set_defaults(func=process_embed_file)
 
     extract_parser = subparsers.add_parser(
@@ -313,6 +311,7 @@ def main():
     extract_parser.add_argument('host_file', help='Path to the host file')
     extract_parser.add_argument('-p', '--password', help='Password for decryption', default=defaultpassword)
     extract_parser.add_argument('-m', '--marker', help='Marker for extracting data', default=defaultmarker)
+    extract_parser.add_argument('-xor', help='Custom XOR key for marker', default=None)
     extract_parser.set_defaults(func=process_extract_file)
 
     embed_string_parser = subparsers.add_parser('embed_string', help='Embed a string into a host file')
@@ -321,12 +320,14 @@ def main():
     embed_string_parser.add_argument('output_file', help='Path to save the file with embedded string')
     embed_string_parser.add_argument('-p', '--password', help='Password for encryption', default=defaultpassword)
     embed_string_parser.add_argument('-m', '--marker', help='Marker for embedding data', default=defaultmarker)
+    embed_string_parser.add_argument('-xor', help='Custom XOR key for marker', default=None)
     embed_string_parser.set_defaults(func=process_embed_string)
 
     extract_string_parser = subparsers.add_parser('extract_string', help='Extract an embedded string from a host file')
     extract_string_parser.add_argument('host_file', help='Path to the host file')
     extract_string_parser.add_argument('-p', '--password', help='Password for decryption', default=defaultpassword)
     extract_string_parser.add_argument('-m', '--marker', help='Marker for extracting data', default=defaultmarker)
+    extract_string_parser.add_argument('-xor', help='Custom XOR key for marker', default=None)
     extract_string_parser.set_defaults(func=process_extract_string)
 
     deembed_parser = subparsers.add_parser(
@@ -337,6 +338,7 @@ def main():
     deembed_parser.add_argument('host_file', help='Path to the host file')
     deembed_parser.add_argument('output_file', help='Path to save the cleaned host file')
     deembed_parser.add_argument('-m', '--marker', help='Marker for removing embedded data', default=defaultmarker)
+    deembed_parser.add_argument('-xor', help='Custom XOR key for marker', default=None)
     deembed_parser.set_defaults(func=process_deembed_file)
     
     analyze_parser = subparsers.add_parser(
@@ -347,6 +349,7 @@ def main():
     analyze_parser.add_argument('host_file', help='Path to the host file')
     analyze_parser.add_argument('-p', '--password', help='Password for decryption', default=defaultpassword)
     analyze_parser.add_argument('-m', '--marker', help='Marker for analyzing embedded data', default=defaultmarker)
+    analyze_parser.add_argument('-xor', help='Custom XOR key for marker', default=None)
     analyze_parser.set_defaults(func=process_analyze_file)
 
     args = parser.parse_args()

@@ -21,15 +21,15 @@ Embed a file into a host file:
 ```python
 from mymra import embed_file
 
-output_path = embed_file(
+embed_file(
     input_file_path='123.mp4',  # File to embed
     host_file_path='123.png',   # Host file
     output_file_path='1488.png',  # Path to save file with embedded data
     password='COCKER',          # Optional password
     marker='ITSTEST'            # Optional marker
+	xor_key='123'               # Optional XOR-key for marker encryption
 )
 
-print(output_path)
 ```
 
 #### Extracting a File
@@ -42,6 +42,7 @@ output_path = extract_file(
     host_file_path='1488.png',  # File containing embedded data
     password='COCKER',          # Optional password
     marker='ITSTEST'            # Optional marker
+	xor_key='123'               # Optional XOR-key for marker encryption
 )
 
 print(output_path)
@@ -53,15 +54,15 @@ Embed a string into a host file:
 ```python
 from mymra import embed_string
 
-file_path = embed_string(
-    input_string='secret',  # String to embed
+embed_string(
+    input_string='secret',         # String to embed
     host_file_path='123.png',      # Host file
     output_file_path='output.png', # Path to save file with embedded string
     password='COCKER',             # Optional password
-    marker='ITSTEST'          # Optional marker
+    marker='ITSTEST'               # Optional marker
+	xor_key='123'                  # Optional XOR-key for marker encryption
 )
 
-print(file_path)
 ```
 
 #### Extracting a string
@@ -72,8 +73,9 @@ from mymra import extract_string
 
 string = extract_string(
     host_file_path='output.png',      # File with embedded string
-    password='COCKER',             # Optional password
-    marker='ITSTEST'          # Optional marker
+    password='COCKER',                # Optional password
+    marker='ITSTEST'          		  # Optional marker
+	xor_key='123'              		  # Optional XOR-key for marker encryption
 )
 
 print(string)
@@ -85,13 +87,13 @@ Remove embedded data from a file:
 ```python
 from mymra import deembed_file
 
-output_path = deembed_file(
+deembed_file(
     host_file_path='123.png',      # File with embedded data
     output_file_path='321.png',    # Path to save cleaned file
     marker='ITSTEST'               # Optional marker
+	xor_key='123'                  # Optional XOR-key for marker encryption
 )
 
-print(output_path)
 ```
 
 #### Analyzing a File
@@ -105,6 +107,7 @@ result = analyze_file(
     host_file_path='1488.png',  # File containing embedded data
     password='COCKER',          # Optional password
     marker='ITSTEST'            # Optional marker
+	xor_key='123'               # Optional XOR-key for marker encryption
 )
 
 if result['type'] == 'file':
@@ -124,25 +127,25 @@ elif result['type'] == 'string':
 #### Embedding a File
 Embed a file with optional arguments:
 ```bash
-mymra embed 123.mp4 123.png 1488.png -p COCKER -m ITSTEST
+mymra embed 123.mp4 123.png 1488.png -p COCKER -m ITSTEST -xor 123
 ```
 
 #### Extracting a File
 Extract an embedded file using optional arguments:
 ```bash
-mymra extract 1488.png -p COCKER -m ITSTEST
+mymra extract 1488.png -p COCKER -m ITSTEST -xor 123
 ```
 
 #### Embedding a String
 Embed a string into a host file:
 ```bash
-mymra embed_string "Secret Data" 123.png string_embedded.png -p COCKER -m ITSTEST
+mymra embed_string "Secret Data" 123.png string_embedded.png -p COCKER -m ITSTEST -xor 123
 ```
 
 #### Extracting a String
 Extract a string from a host file:
 ```bash
-mymra extract_string string_embedded.png -p COCKER -m ITSTEST
+mymra extract_string string_embedded.png -p COCKER -m ITSTEST -xor 123
 ```
 
 #### Removing Embedded Data
@@ -156,7 +159,7 @@ Analyze a host file to identify embedded content:
 
 - **Analyzing a file containing an embedded file**:
 ```bash
-mymra analyze 1488.png -p COCKER -m ITSTEST
+mymra analyze 1488.png -p COCKER -m ITSTEST -xor 123
 ```
 Expected output:
 ```
@@ -168,7 +171,7 @@ Size: 1048576 bytes
 
 - **Analyzing a file containing an embedded string**:
 ```bash
-mymra analyze string_embedded.png -p COCKER -m ITSTEST
+mymra analyze string_embedded.png -p COCKER -m ITSTEST -xor 123
 ```
 Expected output:
 ```
