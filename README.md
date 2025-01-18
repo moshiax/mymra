@@ -24,7 +24,7 @@ from mymra import embed_file
 embed_file(
     input_file_path='123.mp4',    # File to embed
     host_file_path='123.png',     # Host file
-    output_file_path='1488.png',  # Path to save file with embedded data
+    output_file_path='1488.png',  # Optional path to save result file
     password='COCKER',            # Optional password
     marker='ITSTEST'              # Optional marker
 	xor_key='123'                 # Optional XOR-key for marker encryption
@@ -57,7 +57,7 @@ from mymra import embed_string
 embed_string(
     input_string='secret',         # String to embed
     host_file_path='123.png',      # Host file
-    output_file_path='output.png', # Path to save file with embedded string
+    output_file_path='output.png', # Optional path to save result file
     password='COCKER',             # Optional password
     marker='ITSTEST'               # Optional marker
 	xor_key='123'                  # Optional XOR-key for marker encryption
@@ -89,7 +89,7 @@ from mymra import deembed_file
 
 deembed_file(
     host_file_path='123.png',      # File with embedded data
-    output_file_path='321.png',    # Path to save cleaned file
+    output_file_path='321.png',    # Optional path to save result file
     marker='ITSTEST'               # Optional marker
 	xor_key='123'                  # Optional XOR-key for marker encryption
 )
