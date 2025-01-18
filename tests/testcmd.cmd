@@ -6,7 +6,7 @@ set xor_key=123
 set errors=0
 
 :: Embedding a file
-mymra embed 123.mp4 123.png 1488.png -p %password% -m %marker% -xor %xor_key%
+mymra embed 123.mp4 123.png -o 1488.png -p %password% -m %marker% -xor %xor_key%
 if %errorlevel% neq 0 (
     echo [ERROR] Embedding a file - Failed!
     set /a errors+=1
@@ -33,7 +33,7 @@ if %errorlevel% neq 0 (
 )
 
 :: Embedding a string
-mymra embed_string "This is a secret string" 123.png string_embedded.png -p %password% -m %marker% -xor %xor_key%
+mymra embed_string "This is a secret string" 123.png -o string_embedded.png -p %password% -m %marker% -xor %xor_key%
 if %errorlevel% neq 0 (
     echo [ERROR] Embedding a string - Failed!
     set /a errors+=1
@@ -60,7 +60,7 @@ if %errorlevel% neq 0 (
 )
 
 :: Removing embedded data
-mymra deembed 1488.png cleaned_123.png -m %marker% -xor %xor_key%
+mymra deembed 1488.png -o cleaned_123.png -m %marker% -xor %xor_key%
 if %errorlevel% neq 0 (
     echo [ERROR] Removing embedded data - Failed!
     set /a errors+=1

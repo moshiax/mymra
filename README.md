@@ -127,7 +127,7 @@ elif result['type'] == 'string':
 #### Embedding a File
 Embed a file with optional arguments:
 ```bash
-mymra embed 123.mp4 123.png 1488.png -p COCKER -m ITSTEST -xor 123
+mymra embed 123.mp4 123.png -o 1488.png -p COCKER -m ITSTEST -xor 123
 ```
 
 #### Extracting a File
@@ -139,7 +139,7 @@ mymra extract 1488.png -p COCKER -m ITSTEST -xor 123
 #### Embedding a String
 Embed a string into a host file:
 ```bash
-mymra embed_string "Secret Data" 123.png string_embedded.png -p COCKER -m ITSTEST -xor 123
+mymra embed_string "Secret Data" 123.png -o string_embedded.png -p COCKER -m ITSTEST -xor 123
 ```
 
 #### Extracting a String
@@ -151,7 +151,7 @@ mymra extract_string string_embedded.png -p COCKER -m ITSTEST -xor 123
 #### Removing Embedded Data
 Remove embedded data from a file:
 ```bash
-mymra deembed 1488.png cleaned_123.png -m ITSTEST
+mymra deembed 1488.png -o cleaned_123.png -m ITSTEST
 ```
 
 #### Analyzing a File
