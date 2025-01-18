@@ -22,12 +22,12 @@ Embed a file into a host file:
 from mymra import embed_file
 
 embed_file(
-    input_file_path='123.mp4',  # File to embed
-    host_file_path='123.png',   # Host file
+    input_file_path='123.mp4',    # File to embed
+    host_file_path='123.png',     # Host file
     output_file_path='1488.png',  # Path to save file with embedded data
-    password='COCKER',          # Optional password
-    marker='ITSTEST'            # Optional marker
-	xor_key='123'               # Optional XOR-key for marker encryption
+    password='COCKER',            # Optional password
+    marker='ITSTEST'              # Optional marker
+	xor_key='123'                 # Optional XOR-key for marker encryption
 )
 
 ```
