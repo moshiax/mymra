@@ -5,7 +5,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="mymra", 
-    version="1.5.0.1",  
+    version="1.5.0.2",  
     packages=find_packages(include=["mymra"]),
     install_requires=[
         'pycryptodome',

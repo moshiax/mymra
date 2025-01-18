@@ -10,7 +10,23 @@ logger = logging.getLogger(__name__)
 
 defaultmarker = b'MQAZWERPASDZXW'
 defaultpassword = 'RAMRANCHREALLYROCKS'
-default_xor_key = b'\x5A\x3C\x7E\x1F'
+def prepare_marker(marker=None, xor_key=None):
+    if marker is None:
+        marker = defaultmarker
+
+    if isinstance(marker, str):
+        marker_bytes = marker.encode()
+    elif isinstance(marker, bytes):
+        marker_bytes = marker
+    else:
+        raise ValueError("Marker must be a string or bytes.")
+
+    if xor_key is not None:
+        if isinstance(xor_key, str):
+            xor_key = xor_key.encode()
+        marker_bytes = bytes(b ^ xor_key[i % len(xor_key)] for i, b in enumerate(marker_bytes))
+
+    return marker_bytes
 
 def generate_password_key(password):
     return sha256(password.encode()).digest()
@@ -49,22 +65,20 @@ def extract_embedded_data(host_data, marker):
     return host_data[start_marker_index + len(marker):end_marker_index]
 
 def prepare_marker(marker=None, xor_key=None):
-
     if marker is None:
         marker = defaultmarker
-
-    if xor_key is None:
-        xor_key = default_xor_key
-    elif isinstance(xor_key, str):
-        xor_key = xor_key.encode()
 
     if isinstance(marker, str):
         marker_bytes = marker.encode()
     elif isinstance(marker, bytes):
         marker_bytes = marker
 
-    marker = bytes(b ^ xor_key[i % len(xor_key)] for i, b in enumerate(marker_bytes))
-    return marker
+    if xor_key is not None:
+        if isinstance(xor_key, str):
+            xor_key = xor_key.encode()
+        marker_bytes = bytes(b ^ xor_key[i % len(xor_key)] for i, b in enumerate(marker_bytes))
+
+    return marker_bytes
 
 def embed_string(input_string, host_file_path, output_file_path, password=None, marker=None, xor_key=None):
     if password is None:

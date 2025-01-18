@@ -6,8 +6,8 @@ from mymra import embed_file, extract_file, embed_string, extract_string, deembe
 #    Password, marker and xor_key arguments are always optional
 #    If not passed, used marker is b'MQAZWERPASDZXW'
 #    If not passed, used password is 'RAMRANCHREALLYROCKS'
-#    If not passed, used xor key is b'\x5A\x3C\x7E\x1F'
-#
+#    If not passed, no xor is used.
+#   
 
 init()
 
