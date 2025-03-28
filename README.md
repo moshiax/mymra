@@ -27,7 +27,7 @@ embed_file(
     output_file_path='1488.png',  # Optional path to save result file
     password='COCKER',            # Optional password
     marker='ITSTEST'              # Optional marker
-	xor_key='123'                 # Optional XOR-key for marker encryption
+    xor_key='123'                 # Optional XOR-key for marker encryption
 )
 
 ```
@@ -42,7 +42,7 @@ output_path = extract_file(
     host_file_path='1488.png',  # File containing embedded data
     password='COCKER',          # Optional password
     marker='ITSTEST'            # Optional marker
-	xor_key='123'               # Optional XOR-key for marker encryption
+    xor_key='123'               # Optional XOR-key for marker encryption
 )
 
 print(output_path)
@@ -55,12 +55,12 @@ Embed a string into a host file:
 from mymra import embed_string
 
 embed_string(
-    input_string='secret',         # String to embed
-    host_file_path='123.png',      # Host file
-    output_file_path='output.png', # Optional path to save result file
-    password='COCKER',             # Optional password
-    marker='ITSTEST'               # Optional marker
-	xor_key='123'                  # Optional XOR-key for marker encryption
+    input_string='secret',          # String to embed
+    host_file_path='123.png',       # Host file
+    output_file_path='output.png',  # Optional path to save result file
+    password='COCKER',              # Optional password
+    marker='ITSTEST'                # Optional marker
+    xor_key='123'                   # Optional XOR-key for marker encryption
 )
 
 ```
@@ -72,10 +72,10 @@ Extract a string from file:
 from mymra import extract_string
 
 string = extract_string(
-    host_file_path='output.png',      # File with embedded string
-    password='COCKER',                # Optional password
-    marker='ITSTEST'          		  # Optional marker
-	xor_key='123'              		  # Optional XOR-key for marker encryption
+    host_file_path='output.png',  # File with embedded string
+    password='COCKER',            # Optional password
+    marker='ITSTEST'              # Optional marker
+    xor_key='123'                 # Optional XOR-key for marker encryption
 )
 
 print(string)
@@ -88,10 +88,10 @@ Remove embedded data from a file:
 from mymra import deembed_file
 
 deembed_file(
-    host_file_path='123.png',      # File with embedded data
-    output_file_path='321.png',    # Optional path to save result file
-    marker='ITSTEST'               # Optional marker
-	xor_key='123'                  # Optional XOR-key for marker encryption
+    host_file_path='123.png',    # File with embedded data
+    output_file_path='321.png',  # Optional path to save result file
+    marker='ITSTEST'             # Optional marker
+    xor_key='123'                # Optional XOR-key for marker encryption
 )
 
 ```
@@ -107,7 +107,7 @@ result = analyze_file(
     host_file_path='1488.png',  # File containing embedded data
     password='COCKER',          # Optional password
     marker='ITSTEST'            # Optional marker
-	xor_key='123'               # Optional XOR-key for marker encryption
+    xor_key='123'               # Optional XOR-key for marker encryption
 )
 
 if result['type'] == 'file':
